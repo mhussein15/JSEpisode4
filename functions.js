@@ -9,7 +9,7 @@ const books = require("./books.json");
  * - returns undefined if no matching book is found
  ****************************************************************/
 function getBookById(bookId, books) {
-  return books.find((el) => el.id === bookId);
+  return books.find((book) => book.id === bookId);
 }
 // console.log(getBookById(12, books));
 
@@ -22,7 +22,7 @@ function getBookById(bookId, books) {
  ****************************************************************/
 function getAuthorByName(authorName, authors) {
   return authors.find(
-    (el) => el.name.toLowerCase() === authorName.toLowerCase()
+    (author) => author.name.toLowerCase() === authorName.toLowerCase()
   );
 }
 // console.log(getAuthorByName("J.K. Rowling", authors));
@@ -34,15 +34,14 @@ function getAuthorByName(authorName, authors) {
  *    [{ author: <NAME>, bookCount: <NUMBER_OF_BOOKS> }]
  ****************************************************************/
 function bookCountsByAuthor(authors) {
-  const arr = [];
-  authors.forEach((el) => {
+  const answer = authors.map((el) => {
     let author = el.name;
     let bookCount = el.books.length;
-    arr.push({ author, bookCount });
+    return { author, bookCount };
   });
-  return arr;
+  return answer;
 }
-// console.log(bookCountsByAuthor(authors));
+console.log(bookCountsByAuthor(authors));
 
 /**************************************************************
  * booksByColor(books):
@@ -55,15 +54,14 @@ function booksByColor(books) {
   const colors = {};
   books.forEach((book) => {
     if (!colors[book.color]) {
-      colors[book.color] = [book.title]
-    }
-    else{
-      colors[book.color] = [...colors[book.color],book.title]
+      colors[book.color] = [book.title];
+    } else {
+      colors[book.color] = [...colors[book.color], book.title];
     }
   });
   return colors;
 }
-console.log(booksByColor(books));
+// console.log(booksByColor(books));
 
 /**************************************************************
  * titlesByAuthorName(authorName, authors, books):
@@ -74,21 +72,21 @@ console.log(booksByColor(books));
  *    ["The Hitchhikers Guide", "The Meaning of Liff"]
  ****************************************************************/
 function titlesByAuthorName(authorName, authors, books) {
-  let arr = [];
-  authors.forEach((el) => {
-    if (authorName.toLowerCase() === el.name.toLowerCase()) {
-      arr = el.books;
+  let authorBookIds = [];
+  authors.forEach((author) => {
+    if (authorName.toLowerCase() === author.name.toLowerCase()) {
+     authorBookIds = author.books;
     }
   });
-  const ans = [];
-  arr.forEach((el) => {
+  const answer = [];
+  authorBookIds.forEach((bookID) => {
     books.forEach((book) => {
-      if (book.id === el) {
-        ans.push(book.title);
+      if (book.id === bookID) {
+        answer.push(book.title);
       }
     });
   });
-  return ans;
+  return answer;
 }
 // console.log(titlesByAuthorName("George R.R. Martin", authors, books));
 
@@ -108,7 +106,6 @@ function mostProlificAuthor(authors) {
       name = el.name;
     }
   });
-
   return name;
 }
 // console.log(mostProlificAuthor(authors));
@@ -137,22 +134,18 @@ function mostProlificAuthor(authors) {
  * BONUS: REMOVE DUPLICATE BOOKS
  ****************************************************************/
 function relatedBooks(bookId, authors, books) {
-  const names = [];
-  books.forEach((el) => {
-    if (bookId === el.id) {
-      for (const author of el.authors) {
-        names.push(author.name);
-      }
+  let names = []
+  books.forEach((book) => {
+    if (bookId === book.id) {
+      names = book.authors.map(author=> author.name)
     }
   });
-  
-  const arr = [];
-  names.forEach((el) => {
-    arr.push(titlesByAuthorName(el, authors, books));
-  });
-
+  const arr = names.map((el) => titlesByAuthorName(el, authors, books));
   let flattened = [].concat(...arr);
+  
+  //Remove Duplicates using Set
   // const ans = Array.from(new Set(flattened));
+
   return flattened.sort();
 }
 // console.log(relatedBooks(46, authors, books));
